@@ -148,13 +148,7 @@ bool ScanUtils::ParseScanResult(unique_ptr<const NL80211Packet> packet,
     vector<uint8_t> ssid;
     if (!GetSSIDFromInfoElement(ie, &ssid)) {
       // Skip BSS without SSID IE.
-      // It might be from a hidden network. Framework doesn't need it.
-      return false;
-    }
-    if (ssid.empty() ||
-        std::all_of(ssid.begin(), ssid.end(), [](uint8_t c) {return c == 0;})) {
-      // Skip BSS with empty or all-zero SSID.
-      // It might be from a hidden network. Framework doesn't need it.
+      // These scan results are considered as malformed.
       return false;
     }
     uint64_t tsf;
@@ -298,6 +292,25 @@ bool ScanUtils::StopScheduledScan(uint32_t interface_index) {
     LOG(ERROR) << "Receive ERROR message in response to"
                << " 'stop scheduled scan' request: "
                << strerror(error_code);
+    return false;
+  }
+  return true;
+}
+
+bool ScanUtils::AbortScan(uint32_t interface_index) {
+  NL80211Packet abort_scan(
+      netlink_manager_->GetFamilyId(),
+      NL80211_CMD_ABORT_SCAN,
+      netlink_manager_->GetSequenceNumber(),
+      getpid());
+
+  // Force an ACK response upon success.
+  abort_scan.AddFlag(NLM_F_ACK);
+  abort_scan.AddAttribute(
+      NL80211Attr<uint32_t>(NL80211_ATTR_IFINDEX, interface_index));
+
+  if (!netlink_manager_->SendMessageAndGetAck(abort_scan)) {
+    LOG(ERROR) << "NL80211_CMD_ABORT_SCAN failed";
     return false;
   }
   return true;

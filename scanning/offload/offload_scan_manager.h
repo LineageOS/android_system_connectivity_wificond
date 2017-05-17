@@ -35,6 +35,7 @@ namespace wifi {
 namespace wificond {
 
 class NativeScanResult;
+class NativeScanStats;
 
 }  // namespace wificond
 }  // namespace wifi
@@ -80,12 +81,45 @@ class OffloadScanManager {
       kError
   };
 
+  enum ReasonCode {
+      /* Default value */
+      kNone,
+      /* Offload HAL service not available */
+      kNotSupported,
+      /* Offload HAL service is not connected */
+      kNotAvailable,
+      /* Offload HAL service is not subscribed to */
+      kNotSubscribed,
+  };
+
   explicit OffloadScanManager(OffloadServiceUtils* utils,
       OnNativeScanResultsReadyHandler handler);
   virtual ~OffloadScanManager();
-  /* Caller can use this method to obtain status of the Offload HAL service
-   * before invoking methods to perform disconnected PNO scans */
+  /* Request start of offload scans with scan parameters and scan filter
+   * settings. Internally calls Offload HAL service with configureScans()
+   * and subscribeScanResults() APIs. If already subscribed, it updates
+   * the scan configuration only. Reason code is updated in failure case
+   */
+  bool startScan(
+      uint32_t /* interval_ms */,
+      int32_t /* rssi_threshold */,
+      const std::vector<std::vector<uint8_t>>& /* scan_ssids */,
+      const std::vector<std::vector<uint8_t>>& /* match_ssids */,
+      const std::vector<uint8_t>& /* match_security */,
+      const std::vector<uint32_t>& /* freqs */,
+      ReasonCode* /* failure reason */);
+  /* Request stop of offload scans, returns true if scans were subscribed
+   * to from the Offload HAL service. Otherwise, returns false. Reason code
+   * is updated in case of failure.
+   */
+  bool stopScan(ReasonCode* /* failure reason */);
+  /* Get statistics for scans performed by Offload HAL */
+  bool getScanStats(
+      ::com::android::server::wifi::wificond::NativeScanStats* /* scanStats */);
+  /* Otain status of the Offload HAL service */
   StatusCode getOffloadStatus() const;
+  /* Check if Offload service is supported on this device */
+  bool isOffloadScanSupported() const;
 
  private:
   void ReportScanResults(const std::vector<ScanResult> scanResult);
@@ -93,9 +127,12 @@ class OffloadScanManager {
 
   android::sp<IOffload> wifi_offload_hal_;
   android::sp<OffloadCallback> wifi_offload_callback_;
-  OnNativeScanResultsReadyHandler scan_result_handler_;
   StatusCode offload_status_;
+  bool subscription_enabled_;
+  bool service_available_;
+
   const std::unique_ptr<OffloadCallbackHandlersImpl> offload_callback_handlers_;
+  OnNativeScanResultsReadyHandler scan_result_handler_;
 
   friend class OffloadCallbackHandlersImpl;
 };

@@ -14,33 +14,105 @@
  * limitations under the License.
  */
 #include "wificond/scanning/offload/offload_scan_utils.h"
+
+#include <android-base/logging.h>
+
 #include "wificond/scanning/scan_result.h"
+#include "wificond/scanning/offload/scan_stats.h"
 
 using ::com::android::server::wifi::wificond::NativeScanResult;
+using ::com::android::server::wifi::wificond::NativeScanStats;
 using android::hardware::wifi::offload::V1_0::ScanResult;
+using android::hardware::wifi::offload::V1_0::ScanParam;
+using android::hardware::wifi::offload::V1_0::ScanFilter;
+using android::hardware::wifi::offload::V1_0::ScanStats;
+using android::hardware::wifi::offload::V1_0::NetworkInfo;
+using android::hardware::hidl_vec;
+using std::vector;
 
 namespace android {
 namespace wificond {
 
-std::vector<NativeScanResult> OffloadScanUtils::convertToNativeScanResults(
-    const std::vector<ScanResult>& scanResult) {
-  std::vector<NativeScanResult> nativeScanResult;
-  nativeScanResult.reserve(scanResult.size());
-  for (size_t i = 0; i < scanResult.size(); i++) {
-    NativeScanResult singleScanResult;
-    singleScanResult.ssid = scanResult[i].networkInfo.ssid;
-    singleScanResult.bssid.assign(scanResult[i].networkInfo.ssid.begin(),
-      scanResult[i].networkInfo.ssid.end());
-    singleScanResult.frequency = scanResult[i].frequency;
-    singleScanResult.signal_mbm = scanResult[i].rssi;
-    singleScanResult.tsf = scanResult[i].tsf;
-    singleScanResult.capability = scanResult[i].capability;
-    singleScanResult.associated = false;
-    nativeScanResult.emplace_back(singleScanResult);
+vector<NativeScanResult> OffloadScanUtils::convertToNativeScanResults(
+    const vector<ScanResult>& scan_result) {
+  vector<NativeScanResult> native_scan_result;
+  native_scan_result.reserve(scan_result.size());
+  for (size_t i = 0; i < scan_result.size(); i++) {
+    NativeScanResult single_scan_result;
+    single_scan_result.ssid = scan_result[i].networkInfo.ssid;
+    single_scan_result.bssid.assign(scan_result[i].networkInfo.ssid.begin(),
+        scan_result[i].networkInfo.ssid.end());
+    single_scan_result.frequency = scan_result[i].frequency;
+    single_scan_result.signal_mbm = scan_result[i].rssi;
+    single_scan_result.tsf = scan_result[i].tsf;
+    single_scan_result.capability = scan_result[i].capability;
+    single_scan_result.associated = false;
+    native_scan_result.emplace_back(single_scan_result);
   }
-  return nativeScanResult;
+  return native_scan_result;
 }
 
-} // wificond
-} // android
+ScanParam OffloadScanUtils::createScanParam(
+    const vector<vector<uint8_t>>& ssid_list,
+    const vector<uint32_t>& frequency_list, uint32_t scan_interval_ms) {
+  ScanParam scan_param;
+  scan_param.disconnectedModeScanIntervalMs = scan_interval_ms;
+  scan_param.frequencyList = frequency_list;
+  vector<hidl_vec<uint8_t>> ssid_list_tmp;
+  for (const auto& ssid : ssid_list) {
+    ssid_list_tmp.push_back(ssid);
+  }
+  scan_param.ssidList = ssid_list_tmp;
+  return scan_param;
+}
+
+ScanFilter OffloadScanUtils::createScanFilter(
+    const vector<vector<uint8_t>>& ssids,
+    const vector<uint8_t>& flags, int8_t rssi_threshold) {
+  ScanFilter scan_filter;
+  vector<NetworkInfo> nw_info_list;
+  size_t i = 0;
+  scan_filter.rssiThreshold = rssi_threshold;
+  // Note that the number of ssids should match the number of security flags
+  for (const auto& ssid : ssids) {
+      NetworkInfo nw_info;
+      nw_info.ssid = ssid;
+      if (i < flags.size()) {
+        nw_info.flags = flags[i++];
+      } else {
+        continue;
+      }
+      nw_info_list.push_back(nw_info);
+  }
+  scan_filter.preferredNetworkInfoList = nw_info_list;
+  return scan_filter;
+}
+
+NativeScanStats OffloadScanUtils::convertToNativeScanStats(
+    const ScanStats& scanStats) {
+  uint32_t num_channels_scanned = 0;
+  uint32_t scan_duration_ms = 0;
+  vector<uint8_t> histogram_channels;
+
+  for (size_t i = 0; i < scanStats.scanRecord.size(); i++) {
+    scan_duration_ms += scanStats.scanRecord[i].durationMs;
+    num_channels_scanned +=
+        scanStats.scanRecord[i].numChannelsScanned;
+  }
+  for (size_t i = 0; i < scanStats.histogramChannelsScanned.size(); i++) {
+    histogram_channels.push_back(
+      scanStats.histogramChannelsScanned[i]);
+  }
+
+  NativeScanStats native_scan_stats(scanStats.numScansRequestedByWifi,
+      scanStats.numScansServicedByWifi,
+      scanStats.subscriptionDurationMs,
+      scan_duration_ms,
+      num_channels_scanned,
+      histogram_channels);
+  return native_scan_stats;
+}
+
+} // namespace wificond
+} // namespace android
 
