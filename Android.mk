@@ -57,12 +57,12 @@ LOCAL_SRC_FILES := \
     client_interface_binder.cpp \
     client_interface_impl.cpp \
     logging_utils.cpp \
-    looper_backed_event_loop.cpp \
     scanning/channel_settings.cpp \
     scanning/hidden_network.cpp \
     scanning/offload_scan_callback_interface_impl.cpp \
     scanning/pno_network.cpp \
     scanning/pno_settings.cpp \
+    scanning/radio_chain_info.cpp \
     scanning/scan_result.cpp \
     scanning/offload/scan_stats.cpp \
     scanning/single_scan_settings.cpp \
@@ -83,7 +83,8 @@ LOCAL_SHARED_LIBRARIES := \
     libwifi-system-iface
 LOCAL_WHOLE_STATIC_LIBRARIES := \
     libwificond_ipc \
-    libwificond_nl
+    libwificond_nl \
+    libwificond_event_loop
 include $(BUILD_STATIC_LIBRARY)
 
 ###
@@ -104,6 +105,21 @@ LOCAL_SHARED_LIBRARIES := \
 include $(BUILD_STATIC_LIBRARY)
 
 ###
+### wificond event loop library
+###
+include $(CLEAR_VARS)
+LOCAL_MODULE := libwificond_event_loop
+LOCAL_CPPFLAGS := $(wificond_cpp_flags)
+LOCAL_C_INCLUDES := $(wificond_includes)
+LOCAL_SRC_FILES := \
+    looper_backed_event_loop.cpp
+LOCAL_WHOLE_STATIC_LIBRARIES := \
+    liblog \
+    libbase \
+    libutils
+include $(BUILD_STATIC_LIBRARY)
+
+###
 ### wificond IPC interface library
 ###
 include $(CLEAR_VARS)
@@ -114,7 +130,7 @@ LOCAL_CPPFLAGS := $(wificond_cpp_flags)
 LOCAL_SRC_FILES := \
     ipc_constants.cpp \
     aidl/android/net/wifi/IApInterface.aidl \
-    aidl/android/net/wifi/IANQPDoneCallback.aidl \
+    aidl/android/net/wifi/IApInterfaceEventCallback.aidl \
     aidl/android/net/wifi/IClientInterface.aidl \
     aidl/android/net/wifi/IInterfaceEventCallback.aidl \
     aidl/android/net/wifi/IPnoScanEvent.aidl \
@@ -125,6 +141,7 @@ LOCAL_SRC_FILES := \
     scanning/hidden_network.cpp \
     scanning/pno_network.cpp \
     scanning/pno_settings.cpp \
+    scanning/radio_chain_info.cpp \
     scanning/scan_result.cpp \
     scanning/single_scan_settings.cpp
 LOCAL_SHARED_LIBRARIES := \
@@ -139,14 +156,14 @@ LOCAL_MODULE := libwificond_test_utils
 LOCAL_CPPFLAGS := $(wificond_cpp_flags)
 LOCAL_C_INCLUDES := $(wificond_includes)
 LOCAL_SRC_FILES := \
-    looper_backed_event_loop.cpp \
     tests/integration/binder_dispatcher.cpp \
     tests/integration/process_utils.cpp \
     tests/shell_utils.cpp
 LOCAL_SHARED_LIBRARIES := \
     libbase
 LOCAL_WHOLE_STATIC_LIBRARIES := \
-    libwificond_ipc
+    libwificond_ipc \
+    libwificond_event_loop
 include $(BUILD_STATIC_LIBRARY)
 
 ###
