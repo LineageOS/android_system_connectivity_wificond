@@ -16,6 +16,7 @@
 
 #include "wificond/scanning/scanner_impl.h"
 
+#include <set>
 #include <string>
 #include <vector>
 
@@ -245,6 +246,7 @@ void ScannerImpl::ParsePnoSettings(const PnoSettings& pno_settings,
   const uint8_t kNetworkFlagsDefault = 0;
   vector<vector<uint8_t>> skipped_scan_ssids;
   vector<vector<uint8_t>> skipped_match_ssids;
+  std::set<int32_t> unique_frequencies;
   for (auto& network : pno_settings.pno_networks_) {
     // Add hidden network ssid.
     if (network.is_hidden_) {
@@ -263,6 +265,14 @@ void ScannerImpl::ParsePnoSettings(const PnoSettings& pno_settings,
     }
     match_ssids->push_back(network.ssid_);
     match_security->push_back(kNetworkFlagsDefault);
+
+    // build the set of unique frequencies to scan for.
+    for (const auto& frequency : network.frequencies_) {
+      unique_frequencies.insert(frequency);
+    }
+  }
+  for (const auto& frequency : unique_frequencies) {
+    freqs->push_back(frequency);
   }
 
   LogSsidList(skipped_scan_ssids, "Skip scan ssid for pno scan");
@@ -305,7 +315,16 @@ bool ScannerImpl::StartPnoScanDefault(const PnoSettings& pno_settings) {
     CHECK(error_code != ENODEV) << "Driver is in a bad state, restarting wificond";
     return false;
   }
-  LOG(INFO) << "Pno scan started";
+  string freq_string;
+  if (freqs.empty()) {
+    freq_string = "for all supported frequencies";
+  } else {
+    freq_string = "for frequencies: ";
+    for (uint32_t f : freqs) {
+      freq_string += std::to_string(f) + ", ";
+    }
+  }
+  LOG(INFO) << "Pno scan started " << freq_string;
   pno_scan_started_ = true;
   return true;
 }
