@@ -14,31 +14,29 @@
  * limitations under the License.
  */
 
-#ifndef WIFICOND_LOGGING_UTILS_H_
-#define WIFICOND_LOGGING_UTILS_H_
+#ifndef WIFICOND_TESTS_MOCK_AP_INTERFACE_EVENT_CALLBACK_H_
+#define WIFICOND_TESTS_MOCK_AP_INTERFACE_EVENT_CALLBACK_H_
 
-#include <vector>
-#include <sstream>
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
-#include <android-base/macros.h>
-
-#include "wificond/net/netlink_manager.h"
+#include "android/net/wifi/IApInterfaceEventCallback.h"
 
 namespace android {
 namespace wificond {
 
-class LoggingUtils {
+class MockApInterfaceEventCallback
+    : public net::wifi::IApInterfaceEventCallback {
  public:
-  LoggingUtils() = default;
-  static std::string GetMacString(const std::vector<uint8_t>& mac_address);
-  static std::string GetBandwidthString(ChannelBandwidth bandwidth);
+  MockApInterfaceEventCallback() = default;
+  ~MockApInterfaceEventCallback() = default;
 
- private:
-
-  DISALLOW_COPY_AND_ASSIGN(LoggingUtils);
+  MOCK_METHOD0(onAsBinder, IBinder*());
+  MOCK_METHOD1(onNumAssociatedStationsChanged, ::android::binder::Status(int));
+  MOCK_METHOD2(onSoftApChannelSwitched, ::android::binder::Status(int, int));
 };
 
 }  // namespace wificond
 }  // namespace android
 
-#endif  // WIFICOND_LOGGING_UTILS_H_
+#endif  // WIFICOND_TESTS_MOCK_AP_INTERFACE_EVENT_CALLBACK_H_
