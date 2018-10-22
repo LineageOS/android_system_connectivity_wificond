@@ -247,6 +247,7 @@ void ScannerImpl::ParsePnoSettings(const PnoSettings& pno_settings,
   vector<vector<uint8_t>> skipped_scan_ssids;
   vector<vector<uint8_t>> skipped_match_ssids;
   std::set<int32_t> unique_frequencies;
+  int num_networks_no_freqs = 0;
   for (auto& network : pno_settings.pno_networks_) {
     // Add hidden network ssid.
     if (network.is_hidden_) {
@@ -270,11 +271,20 @@ void ScannerImpl::ParsePnoSettings(const PnoSettings& pno_settings,
     for (const auto& frequency : network.frequencies_) {
       unique_frequencies.insert(frequency);
     }
+    if (network.frequencies_.empty()) {
+      num_networks_no_freqs++;
+    }
+  }
+
+  // Also scan the default frequencies if more than 30% of networks don't have frequency data.
+  if (num_networks_no_freqs * 100 / match_ssids->size() > 30) {
+      std::set<int32_t> default_frequencies = {2412, 2417, 2422, 2427, 2432, 2437, 2447, 2452, 2457,
+          2462, 5180, 5200, 5220, 5240, 5745, 5765, 5785, 5805};
+      unique_frequencies.insert(default_frequencies.begin(), default_frequencies.end());
   }
   for (const auto& frequency : unique_frequencies) {
     freqs->push_back(frequency);
   }
-
   LogSsidList(skipped_scan_ssids, "Skip scan ssid for pno scan");
   LogSsidList(skipped_match_ssids, "Skip match ssid for pno scan");
 }

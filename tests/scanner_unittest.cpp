@@ -644,5 +644,44 @@ TEST_F(ScannerTest, TestStartPnoScanWithFrequencyListNoDuplicates) {
   EXPECT_TRUE(success);
 }
 
+// Verify that if more than 30% of networks don't have frequency data then a list of default
+// frequencies will be added to the scan.
+TEST_F(ScannerTest, TestStartPnoScanWithFrequencyListFallbackMechanism) {
+  bool success = false;
+  ScanCapabilities scan_capabilities_test_frequencies(
+      1 /* max_num_scan_ssids */,
+      1 /* max_num_sched_scan_ssids */,
+      2 /* max_match_sets */,
+      0,
+      kFakeScanIntervalMs * PnoSettings::kSlowScanIntervalMultiplier / 1000,
+      PnoSettings::kFastScanIterations);
+  EXPECT_CALL(*offload_service_utils_, IsOffloadScanSupported())
+        .Times(1)
+        .WillRepeatedly(Return(false));
+  ScannerImpl scanner_impl(kFakeInterfaceIndex, scan_capabilities_test_frequencies,
+                           wiphy_features_, &client_interface_impl_,
+                           &scan_utils_, offload_service_utils_);
+
+  PnoSettings pno_settings;
+  PnoNetwork network;
+  PnoNetwork network2;
+  network.is_hidden_ = false;
+  network.frequencies_.push_back(5640);
+  network2.is_hidden_ = false;
+  pno_settings.pno_networks_.push_back(network);
+  pno_settings.pno_networks_.push_back(network2);
+
+  std::set<int32_t> default_frequencies = {2412, 2417, 2422, 2427, 2432, 2437, 2447, 2452, 2457,
+      2462, 5180, 5200, 5220, 5240, 5745, 5765, 5785, 5805};
+  default_frequencies.insert(5640); // add frequency from saved network
+  vector<uint32_t> expected_frequencies(default_frequencies.begin(), default_frequencies.end());
+  EXPECT_CALL(
+      scan_utils_,
+      StartScheduledScan(_, _, _, _, _, false, _, _, Eq(expected_frequencies), _)).
+          WillOnce(Return(true));
+  EXPECT_TRUE(scanner_impl.startPnoScan(pno_settings, &success).isOk());
+  EXPECT_TRUE(success);
+}
+
 }  // namespace wificond
 }  // namespace android
