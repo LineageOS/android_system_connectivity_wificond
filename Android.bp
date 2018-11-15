@@ -141,6 +141,7 @@ cc_library_static {
         "aidl/android/net/wifi/IInterfaceEventCallback.aidl",
         "aidl/android/net/wifi/IPnoScanEvent.aidl",
         "aidl/android/net/wifi/IScanEvent.aidl",
+        "aidl/android/net/wifi/ISendMgmtFrameEvent.aidl",
         "aidl/android/net/wifi/IWificond.aidl",
         "aidl/android/net/wifi/IWifiScannerImpl.aidl",
         "scanning/channel_settings.cpp",

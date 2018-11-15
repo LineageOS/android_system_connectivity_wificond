@@ -16,6 +16,7 @@
 
 package android.net.wifi;
 
+import android.net.wifi.ISendMgmtFrameEvent;
 import android.net.wifi.IWifiScannerImpl;
 
 // IClientInterface represents a network interface that can be used to connect
@@ -51,4 +52,17 @@ interface IClientInterface {
   // Set the MAC address of this interface
   // Returns true if the set was successful
   boolean setMacAddress(in byte[] mac);
+
+  // Sends an arbitrary 802.11 management frame on the current channel.
+  // @param frame Bytes of the 802.11 management frame to be sent, including the
+  //     header, but not including the frame check sequence (FCS).
+  // @param Callback triggered when the transmitted frame is ACKed or the
+  //     transmission fails.
+  // @param mcs MCS rate which the management frame will be sent at. If mcs < 0,
+  //     the driver will select the rate automatically. If the device does not
+  //     support sending the frame at a specified MCS rate, the transmission
+  //     will be aborted and ISendMgmtFrameEvent.OnFailure() will be called with
+  //     reason ISendMgmtFrameEvent.SEND_MGMT_FRAME_ERROR_MCS_UNSUPPORTED.
+  oneway void SendMgmtFrame(
+      in byte[] frame, in ISendMgmtFrameEvent callback, int mcs);
 }

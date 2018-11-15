@@ -87,6 +87,8 @@ WiphyFeatures::WiphyFeatures(uint32_t feature_flags,
   supports_high_accuracy_oneshot_scan =
       IsExtFeatureFlagSet(ext_feature_flags_bytes,
                           NL80211_EXT_FEATURE_HIGH_ACCURACY_SCAN);
+  // TODO (b/112029045) check if sending frame at specified MCS is supported
+  supports_tx_mgmt_frame_mcs = false;
 }
 
 NetlinkUtils::NetlinkUtils(NetlinkManager* netlink_manager)
@@ -593,6 +595,40 @@ bool NetlinkUtils::GetCountryCode(string* out_country_code) {
   return true;
 }
 
+bool NetlinkUtils::SendMgmtFrame(uint32_t interface_index,
+    const vector<uint8_t>& frame, int32_t mcs, uint64_t* out_cookie) {
+
+  NL80211Packet send_mgmt_frame(
+      netlink_manager_->GetFamilyId(),
+      NL80211_CMD_FRAME,
+      netlink_manager_->GetSequenceNumber(),
+      getpid());
+
+  send_mgmt_frame.AddAttribute(
+      NL80211Attr<uint32_t>(NL80211_ATTR_IFINDEX, interface_index));
+
+  send_mgmt_frame.AddAttribute(
+      NL80211Attr<vector<uint8_t>>(NL80211_ATTR_FRAME, frame));
+
+  if (mcs >= 0) {
+    // TODO (b/112029045) if mcs >= 0, add MCS attribute
+  }
+
+  unique_ptr<const NL80211Packet> response;
+  if (!netlink_manager_->SendMessageAndGetSingleResponse(
+      send_mgmt_frame, &response)) {
+    LOG(ERROR) << "NL80211_CMD_FRAME failed";
+    return false;
+  }
+
+  if (!response->GetAttributeValue(NL80211_ATTR_COOKIE, out_cookie)) {
+    LOG(ERROR) << "Get NL80211_ATTR_COOKIE failed";
+    return false;
+  }
+
+  return true;
+}
+
 void NetlinkUtils::SubscribeMlmeEvent(uint32_t interface_index,
                                       MlmeEventHandler* handler) {
   netlink_manager_->SubscribeMlmeEvent(interface_index, handler);
@@ -630,6 +666,14 @@ void NetlinkUtils::UnsubscribeChannelSwitchEvent(uint32_t interface_index) {
   netlink_manager_->UnsubscribeChannelSwitchEvent(interface_index);
 }
 
+void NetlinkUtils::SubscribeFrameTxStatusEvent(
+    uint32_t interface_index, OnFrameTxStatusEventHandler handler) {
+  netlink_manager_->SubscribeFrameTxStatusEvent(interface_index, handler);
+}
+
+void NetlinkUtils::UnsubscribeFrameTxStatusEvent(uint32_t interface_index) {
+  netlink_manager_->UnsubscribeFrameTxStatusEvent(interface_index);
+}
 
 }  // namespace wificond
 }  // namespace android
