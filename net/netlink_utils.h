@@ -123,11 +123,13 @@ struct StationInfo {
   StationInfo(uint32_t station_tx_packets_,
               uint32_t station_tx_failed_,
               uint32_t station_tx_bitrate_,
-              int8_t current_rssi_)
+              int8_t current_rssi_,
+              uint32_t station_rx_bitrate_)
       : station_tx_packets(station_tx_packets_),
         station_tx_failed(station_tx_failed_),
         station_tx_bitrate(station_tx_bitrate_),
-        current_rssi(current_rssi_) {}
+        current_rssi(current_rssi_),
+        station_rx_bitrate(station_rx_bitrate_) {}
   // Number of successfully transmitted packets.
   int32_t station_tx_packets;
   // Number of tramsmission failures.
@@ -136,6 +138,8 @@ struct StationInfo {
   uint32_t station_tx_bitrate;
   // Current signal strength.
   int8_t current_rssi;
+  // Last Received unicast packet bit rate in 100kbit/s.
+  uint32_t station_rx_bitrate;
   // There are many other counters/parameters included in station info.
   // We will add them once we find them useful.
 };
