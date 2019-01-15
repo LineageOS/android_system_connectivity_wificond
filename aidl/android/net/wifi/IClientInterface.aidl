@@ -33,6 +33,7 @@ interface IClientInterface {
   // First element in array is the RSSI value in dBM.
   // Second element in array is the transmission bit rate in Mbps.
   // Third element in array is the association frequency in MHz.
+  // Fourth element in array is the last received packet bit rate in Mbps.
   // This call is valid only when interface is associated with an AP, otherwise
   // it returns an empty array.
   int[] signalPoll();
