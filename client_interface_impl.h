@@ -27,6 +27,7 @@
 #include <wifi_system/interface_tool.h>
 
 #include "android/net/wifi/IClientInterface.h"
+#include "android/net/wifi/ISendMgmtFrameEvent.h"
 #include "wificond/net/mlme_event_handler.h"
 #include "wificond/net/netlink_utils.h"
 #include "wificond/scanning/offload/offload_service_utils.h"
@@ -82,6 +83,10 @@ class ClientInterfaceImpl {
   bool SetMacAddress(const std::array<uint8_t, ETH_ALEN>& mac);
   virtual bool IsAssociated() const;
   void Dump(std::stringstream* ss) const;
+  void SendMgmtFrame(
+      const std::vector<uint8_t>& frame,
+      const sp<::android::net::wifi::ISendMgmtFrameEvent>& callback,
+      int32_t mcs);
 
  private:
   bool RefreshAssociateFreq();
@@ -107,6 +112,11 @@ class ClientInterfaceImpl {
   BandInfo band_info_;
   ScanCapabilities scan_capabilities_;
   WiphyFeatures wiphy_features_;
+
+  // handler for frame tx status messages
+  bool frame_tx_in_progress_;
+  uint64_t frame_tx_status_cookie_;
+  std::function<void(bool was_acked)> on_frame_tx_status_event_handler_;
 
   DISALLOW_COPY_AND_ASSIGN(ClientInterfaceImpl);
   friend class MlmeEventHandlerImpl;
