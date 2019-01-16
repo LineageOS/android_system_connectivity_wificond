@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 
+#include <net/if.h>
 #include <linux/netlink.h>
 
 #include <android-base/logging.h>
@@ -98,13 +99,18 @@ NetlinkUtils::NetlinkUtils(NetlinkManager* netlink_manager)
 
 NetlinkUtils::~NetlinkUtils() {}
 
-bool NetlinkUtils::GetWiphyIndex(uint32_t* out_wiphy_index) {
+bool NetlinkUtils::GetWiphyIndex(uint32_t* out_wiphy_index,
+                                 const std::string& iface_name) {
   NL80211Packet get_wiphy(
       netlink_manager_->GetFamilyId(),
       NL80211_CMD_GET_WIPHY,
       netlink_manager_->GetSequenceNumber(),
       getpid());
   get_wiphy.AddFlag(NLM_F_DUMP);
+  if (!iface_name.empty()) {
+    int ifindex = if_nametoindex(iface_name.c_str());
+    get_wiphy.AddAttribute(NL80211Attr<uint32_t>(NL80211_ATTR_IFINDEX, ifindex));
+  }
   vector<unique_ptr<const NL80211Packet>> response;
   if (!netlink_manager_->SendMessageAndGetResponses(get_wiphy, &response))  {
     LOG(ERROR) << "NL80211_CMD_GET_WIPHY dump failed";
@@ -137,6 +143,10 @@ bool NetlinkUtils::GetWiphyIndex(uint32_t* out_wiphy_index) {
     }
   }
   return true;
+}
+
+bool NetlinkUtils::GetWiphyIndex(uint32_t* out_wiphy_index) {
+  return GetWiphyIndex(out_wiphy_index, "");
 }
 
 bool NetlinkUtils::GetInterfaces(uint32_t wiphy_index,
