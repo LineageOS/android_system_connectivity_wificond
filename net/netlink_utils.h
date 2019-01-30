@@ -157,6 +157,8 @@ class NetlinkUtils {
   // |*out_wiphy_index| returns the wiphy index from kernel.
   // Returns true on success.
   virtual bool GetWiphyIndex(uint32_t* out_wiphy_index);
+  virtual bool GetWiphyIndex(uint32_t* out_wiphy_index,
+                             const std::string& iface_name);
 
   // Get wifi interfaces info from kernel.
   // |wiphy_index| is the wiphy index we get using GetWiphyIndex().
