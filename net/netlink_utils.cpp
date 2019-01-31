@@ -520,12 +520,9 @@ bool NetlinkUtils::GetStationInfo(uint32_t interface_index,
                             &tx_bitrate_attr)) {
     if (!tx_bitrate_attr.GetAttributeValue(NL80211_RATE_INFO_BITRATE32,
                                          &tx_bitrate)) {
-      LOG(ERROR) << "Failed to get TX NL80211_RATE_INFO_BITRATE32";
       // Return invalid tx rate to avoid breaking the get station cmd
       tx_bitrate = 0;
     }
-  } else {
-      LOG(ERROR) << "Failed to get NL80211_STA_INFO_TX_BITRATE";
   }
   NL80211NestedAttr rx_bitrate_attr(0);
   uint32_t rx_bitrate = 0;
@@ -533,12 +530,9 @@ bool NetlinkUtils::GetStationInfo(uint32_t interface_index,
                             &rx_bitrate_attr)) {
     if (!rx_bitrate_attr.GetAttributeValue(NL80211_RATE_INFO_BITRATE32,
                                          &rx_bitrate)) {
-      LOG(ERROR) << "Failed to get RX NL80211_RATE_INFO_BITRATE32";
       // Return invalid rx rate to avoid breaking the get station cmd
       rx_bitrate = 0;
     }
-  } else {
-      LOG(ERROR) << "Failed to get NL80211_STA_INFO_RX_BITRATE";
   }
   *out_station_info = StationInfo(tx_good, tx_bad, tx_bitrate, current_rssi, rx_bitrate);
   return true;
