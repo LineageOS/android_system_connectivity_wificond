@@ -298,7 +298,7 @@ Status Server::getAvailableDFSChannels(
 
 bool Server::SetupInterface(const std::string& iface_name,
                             InterfaceInfo* interface) {
-  if (!RefreshWiphyIndex()) {
+  if (!RefreshWiphyIndex(iface_name)) {
     return false;
   }
 
@@ -325,8 +325,8 @@ bool Server::SetupInterface(const std::string& iface_name,
   return false;
 }
 
-bool Server::RefreshWiphyIndex() {
-  if (!netlink_utils_->GetWiphyIndex(&wiphy_index_)) {
+bool Server::RefreshWiphyIndex(const std::string& iface_name) {
+  if (!netlink_utils_->GetWiphyIndex(&wiphy_index_, iface_name)) {
     LOG(ERROR) << "Failed to get wiphy index";
     return false;
   }
