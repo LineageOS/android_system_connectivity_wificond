@@ -95,6 +95,7 @@ void ScannerImpl::Invalidate() {
             << (int)interface_index_;
   scan_utils_->UnsubscribeScanResultNotification(interface_index_);
   scan_utils_->UnsubscribeSchedScanResultNotification(interface_index_);
+  valid_ = false;
 }
 
 bool ScannerImpl::CheckIsValid() {
