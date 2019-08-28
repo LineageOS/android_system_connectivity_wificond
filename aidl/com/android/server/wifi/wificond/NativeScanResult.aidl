@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package android.net.wifi;
+package com.android.server.wifi.wificond;
 
-import android.net.wifi.RadioChainInfo;
+import com.android.server.wifi.wificond.RadioChainInfo;
 
 parcelable NativeScanResult {
     /** SSID of the BSS. */

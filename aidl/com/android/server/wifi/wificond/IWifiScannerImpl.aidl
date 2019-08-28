@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package android.net.wifi;
+package com.android.server.wifi.wificond;
 
-import android.net.wifi.IPnoScanEvent;
-import android.net.wifi.IScanEvent;
-import android.net.wifi.NativeScanResult;
-import android.net.wifi.PnoSettings;
-import android.net.wifi.SingleScanSettings;
+import com.android.server.wifi.wificond.IPnoScanEvent;
+import com.android.server.wifi.wificond.IScanEvent;
+import com.android.server.wifi.wificond.NativeScanResult;
+import com.android.server.wifi.wificond.PnoSettings;
+import com.android.server.wifi.wificond.SingleScanSettings;
 
 interface IWifiScannerImpl {
   // Type of scan request. This is used in |SingleScanSettings.scan_type|.

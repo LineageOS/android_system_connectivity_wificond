@@ -14,13 +14,9 @@
  * limitations under the License.
  */
 
-package android.net.wifi;
+package com.android.server.wifi.wificond;
 
-import android.net.wifi.PnoNetwork;
-
-parcelable PnoSettings {
-    int intervalMs;
-    int min2gRssi;
-    int min5gRssi;
-    PnoNetwork[] pnoNetworks;
+parcelable RadioChainInfo {
+    int chainId;
+    int level;
 }

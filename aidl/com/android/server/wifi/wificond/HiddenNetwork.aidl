@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-package android.net.wifi;
+package com.android.server.wifi.wificond;
 
-parcelable PnoNetwork {
-    boolean isHidden;
+parcelable HiddenNetwork {
     byte[] ssid;
-    int[] frequencies;
 }
