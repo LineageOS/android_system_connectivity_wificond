@@ -41,7 +41,6 @@ cc_binary {
         "libhidltransport",
         "libminijail",
         "libutils",
-        "libwifi-system",
         "libwifi-system-iface",
     ],
     static_libs: ["libwificond"],
@@ -83,7 +82,6 @@ cc_library_static {
         "libutils",
         "libhidlbase",
         "libhidltransport",
-        "libwifi-system",
         "libwifi-system-iface",
     ],
     whole_static_libs: [
@@ -158,6 +156,7 @@ filegroup {
         "aidl/android/net/wifi/IInterfaceEventCallback.aidl",
         "aidl/android/net/wifi/IPnoScanEvent.aidl",
         "aidl/android/net/wifi/IScanEvent.aidl",
+        "aidl/android/net/wifi/ISendMgmtFrameEvent.aidl",
         "aidl/android/net/wifi/IWificond.aidl",
         "aidl/android/net/wifi/IWifiScannerImpl.aidl",
     ],
@@ -224,7 +223,6 @@ cc_test {
     static_libs: [
         "libgmock",
         "libgtest",
-        "libwifi-system-test",
         "libwifi-system-iface-test",
         "libwificond",
         "libwificond_nl",
@@ -238,7 +236,6 @@ cc_test {
         "libhidlbase",
         "liblog",
         "libutils",
-        "libwifi-system",
         "libwifi-system-iface",
     ],
 }
@@ -254,7 +251,6 @@ cc_test {
         "tests/integration/client_interface_test.cpp",
         "tests/integration/life_cycle_test.cpp",
         "tests/integration/scanner_test.cpp",
-        "tests/integration/service_test.cpp",
         "tests/main.cpp",
         "tests/shell_unittest.cpp",
     ],
@@ -263,7 +259,6 @@ cc_test {
         "libbinder",
         "libcutils",
         "libutils",
-        "libwifi-system",
         "libwifi-system-iface",
     ],
     static_libs: [
