@@ -146,6 +146,7 @@ cc_library_static {
     },
     srcs: [
         "ipc_constants.cpp",
+        ":libwificond_ipc_user_space_aidl",
         ":libwificond_ipc_aidl",
         "scanning/channel_settings.cpp",
         "scanning/hidden_network.cpp",
@@ -173,6 +174,15 @@ filegroup {
     ],
     path: "aidl",
 }
+
+filegroup {
+    name: "libwificond_ipc_user_space_aidl",
+    srcs: [
+        "aidl/com/android/server/wifi/wificond/NativeWifiClient.aidl",
+    ],
+    path: "aidl",
+}
+
 
 //
 // test util library
