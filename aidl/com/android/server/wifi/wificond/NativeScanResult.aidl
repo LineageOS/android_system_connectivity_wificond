@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 The Android Open Source Project
+ * Copyright (C) 2016 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,6 @@
  * limitations under the License.
  */
 
-package android.net.wifi;
+package com.android.server.wifi.wificond;
 
-import android.net.wifi.ChannelSettings;
-import android.net.wifi.HiddenNetwork;
-
-parcelable SingleScanSettings {
-    /**
-     * Should be one of
-     *   - IWifiScannerImpl.SCAN_TYPE_LOW_SPAN
-     *   - IWifiScannerImpl.SCAN_TYPE_LOW_POWER
-     *   - IWifiScannerImpl.SCAN_TYPE_HIGH_ACCURACY
-     */
-    int scanType;
-    ChannelSettings[] channelSettings;
-    HiddenNetwork[] hiddenNetworks;
-}
+parcelable NativeScanResult cpp_header "wificond/scanning/scan_result.h";

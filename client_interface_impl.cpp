@@ -25,13 +25,13 @@
 #include "wificond/logging_utils.h"
 #include "wificond/net/mlme_event.h"
 #include "wificond/net/netlink_utils.h"
-#include "android/net/wifi/NativeScanResult.h"
+#include "wificond/scanning/scan_result.h"
 #include "wificond/scanning/scan_utils.h"
 #include "wificond/scanning/scanner_impl.h"
 
 using android::net::wifi::IClientInterface;
 using android::net::wifi::ISendMgmtFrameEvent;
-using android::net::wifi::NativeScanResult;
+using com::android::server::wifi::wificond::NativeScanResult;
 using android::sp;
 using android::wifi_system::InterfaceTool;
 
