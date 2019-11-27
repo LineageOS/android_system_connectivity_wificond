@@ -17,7 +17,6 @@
 package com.android.server.wifi.wificond;
 
 import com.android.server.wifi.wificond.IApInterfaceEventCallback;
-import com.android.server.wifi.wificond.NativeWifiClient;
 
 // IApInterface represents a network interface configured to act as a
 // WiFi access point.
@@ -38,6 +37,7 @@ interface IApInterface {
   @utf8InCpp
   String getInterfaceName();
 
-  // @return Returns the associated devices to this hotspot.
-  NativeWifiClient[] getConnectedClients();
+  // @return Returns the number of associated devices to this hotspot.
+  // Returns -1 on failure.
+  int getNumberOfAssociatedStations();
 }

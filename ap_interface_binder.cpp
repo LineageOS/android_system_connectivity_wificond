@@ -21,7 +21,6 @@
 #include "wificond/ap_interface_impl.h"
 
 using com::android::server::wifi::wificond::IApInterfaceEventCallback;
-using com::android::server::wifi::wificond::NativeWifiClient;
 
 namespace android {
 namespace wificond {
@@ -32,11 +31,9 @@ ApInterfaceBinder::ApInterfaceBinder(ApInterfaceImpl* impl)
 ApInterfaceBinder::~ApInterfaceBinder() {
 }
 
-void ApInterfaceBinder::NotifyConnectedClientsChanged(
-    const std::vector<NativeWifiClient>& clients) {
+void ApInterfaceBinder::NotifyNumAssociatedStationsChanged(int num_stations) {
   if (ap_interface_event_callback_ != nullptr) {
-    LOG(DEBUG) << "NotifyConnectedClientsChanged called returning clients count " << clients.size();
-    ap_interface_event_callback_->onConnectedClientsChanged(clients);
+    ap_interface_event_callback_->onNumAssociatedStationsChanged(num_stations);
   }
 }
 
@@ -87,9 +84,9 @@ binder::Status ApInterfaceBinder::getInterfaceName(std::string* out_name) {
   return binder::Status::ok();
 }
 
-binder::Status ApInterfaceBinder::getConnectedClients(
-    std::vector<NativeWifiClient>* out_connected_clients) {
-  *out_connected_clients = impl_->GetConnectedClients();
+binder::Status ApInterfaceBinder::getNumberOfAssociatedStations(
+    int* out_num_of_stations) {
+  *out_num_of_stations = impl_->GetNumberOfAssociatedStations();
   return binder::Status::ok();
 }
 

@@ -24,9 +24,6 @@
 #include "com/android/server/wifi/wificond/BnApInterface.h"
 #include "com/android/server/wifi/wificond/IApInterfaceEventCallback.h"
 
-using com::android::server::wifi::wificond::IApInterfaceEventCallback;
-using com::android::server::wifi::wificond::NativeWifiClient;
-
 namespace android {
 namespace wificond {
 
@@ -42,26 +39,24 @@ class ApInterfaceBinder : public com::android::server::wifi::wificond::BnApInter
   // by remote processes are possible.
   void NotifyImplDead() { impl_ = nullptr; }
 
-  // Called by |impl_| every time the access point's connected clients change.
-  void NotifyConnectedClientsChanged(const
-    std::vector<NativeWifiClient>& clients);
+  // Called by |impl_| everytime number of associated stations changes.
+  void NotifyNumAssociatedStationsChanged(int num_stations);
 
   // Called by |impl_| on every channel switch event.
   void NotifySoftApChannelSwitched(int frequency,
                                    ChannelBandwidth channel_bandwidth);
 
   binder::Status registerCallback(
-      const sp<IApInterfaceEventCallback>& callback,
+      const sp<com::android::server::wifi::wificond::IApInterfaceEventCallback>& callback,
       bool* out_success) override;
   binder::Status getInterfaceName(std::string* out_name) override;
-  binder::Status getConnectedClients(
-        std::vector<NativeWifiClient>*
-            out_connected_clients) override;
+  binder::Status getNumberOfAssociatedStations(
+      int* out_num_of_stations) override;
 
  private:
   ApInterfaceImpl* impl_;
 
-  android::sp<IApInterfaceEventCallback>
+  android::sp<com::android::server::wifi::wificond::IApInterfaceEventCallback>
       ap_interface_event_callback_;
 
   DISALLOW_COPY_AND_ASSIGN(ApInterfaceBinder);
