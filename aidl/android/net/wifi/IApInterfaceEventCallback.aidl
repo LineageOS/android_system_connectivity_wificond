@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.server.wifi.wificond;
+package android.net.wifi;
 
 // A callback for receiving events related to soft AP.
 interface IApInterfaceEventCallback {

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#include "com/android/server/wifi/wificond/IWifiScannerImpl.h"
-#include "com/android/server/wifi/wificond/NativeScanResult.h"
+#include "android/net/wifi/IWifiScannerImpl.h"
+#include "android/net/wifi/NativeScanResult.h"
 #include "wificond/scanning/scan_utils.h"
 
 #include <array>
@@ -30,9 +30,9 @@
 #include "wificond/net/netlink_manager.h"
 #include "wificond/net/nl80211_packet.h"
 
-using com::android::server::wifi::wificond::IWifiScannerImpl;
-using com::android::server::wifi::wificond::NativeScanResult;
-using com::android::server::wifi::wificond::RadioChainInfo;
+using android::net::wifi::IWifiScannerImpl;
+using android::net::wifi::NativeScanResult;
+using android::net::wifi::RadioChainInfo;
 using std::array;
 using std::unique_ptr;
 using std::vector;

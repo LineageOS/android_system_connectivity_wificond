@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package com.android.server.wifi.wificond;
+package android.net.wifi;
 
-import com.android.server.wifi.wificond.PnoNetwork;
-
-parcelable ChannelSettings {
-    int frequency;
+parcelable RadioChainInfo {
+    int chainId;
+    int level;
 }

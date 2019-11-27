@@ -21,15 +21,15 @@
 
 #include "wificond/net/netlink_manager.h"
 
-#include "com/android/server/wifi/wificond/BnApInterface.h"
-#include "com/android/server/wifi/wificond/IApInterfaceEventCallback.h"
+#include "android/net/wifi/BnApInterface.h"
+#include "android/net/wifi/IApInterfaceEventCallback.h"
 
 namespace android {
 namespace wificond {
 
 class ApInterfaceImpl;
 
-class ApInterfaceBinder : public com::android::server::wifi::wificond::BnApInterface {
+class ApInterfaceBinder : public android::net::wifi::BnApInterface {
  public:
   explicit ApInterfaceBinder(ApInterfaceImpl* impl);
   ~ApInterfaceBinder() override;
@@ -47,7 +47,7 @@ class ApInterfaceBinder : public com::android::server::wifi::wificond::BnApInter
                                    ChannelBandwidth channel_bandwidth);
 
   binder::Status registerCallback(
-      const sp<com::android::server::wifi::wificond::IApInterfaceEventCallback>& callback,
+      const sp<net::wifi::IApInterfaceEventCallback>& callback,
       bool* out_success) override;
   binder::Status getInterfaceName(std::string* out_name) override;
   binder::Status getNumberOfAssociatedStations(
@@ -56,7 +56,7 @@ class ApInterfaceBinder : public com::android::server::wifi::wificond::BnApInter
  private:
   ApInterfaceImpl* impl_;
 
-  android::sp<com::android::server::wifi::wificond::IApInterfaceEventCallback>
+  android::sp<net::wifi::IApInterfaceEventCallback>
       ap_interface_event_callback_;
 
   DISALLOW_COPY_AND_ASSIGN(ApInterfaceBinder);
