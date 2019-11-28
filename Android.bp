@@ -55,6 +55,7 @@ cc_library_static {
         "client_interface_binder.cpp",
         "client_interface_impl.cpp",
         "logging_utils.cpp",
+        "client/native_wifi_client.cpp",
         "scanning/channel_settings.cpp",
         "scanning/hidden_network.cpp",
         "scanning/pno_network.cpp",
@@ -124,6 +125,7 @@ cc_library_static {
     srcs: [
         "ipc_constants.cpp",
         ":libwificond_ipc_aidl",
+        "client/native_wifi_client.cpp",
         "scanning/channel_settings.cpp",
         "scanning/hidden_network.cpp",
         "scanning/pno_network.cpp",
@@ -147,7 +149,6 @@ filegroup {
         "aidl/android/net/wifi/ISendMgmtFrameEvent.aidl",
         "aidl/android/net/wifi/IWificond.aidl",
         "aidl/android/net/wifi/IWifiScannerImpl.aidl",
-	"aidl/com/android/server/wifi/wificond/NativeWifiClient.aidl",
     ],
     path: "aidl",
 }
@@ -186,6 +187,7 @@ cc_test {
         "tests/mock_netlink_manager.cpp",
         "tests/mock_netlink_utils.cpp",
         "tests/mock_scan_utils.cpp",
+        "tests/native_wifi_client_unittest.cpp",
         "tests/netlink_manager_unittest.cpp",
         "tests/netlink_utils_unittest.cpp",
         "tests/nl80211_attribute_unittest.cpp",

@@ -94,12 +94,12 @@ void ApInterfaceImpl::OnStationEvent(
     vector<uint8_t> mac_return_address = vector<uint8_t>(mac_address.begin(), mac_address.end());
     const auto iterator = std::find_if(connected_clients_.begin(), connected_clients_.end(),
         [&] (NativeWifiClient const& p) {
-            return p.macAddress == mac_return_address;
+            return p.mac_address_ == mac_return_address;
     });
 
     if (iterator == connected_clients_.end()) {
       NativeWifiClient station;
-      station.macAddress = mac_return_address;
+      station.mac_address_ = mac_return_address;
       connected_clients_.push_back(station);
 
       LOG(INFO) << "Sending notifications for station event";
@@ -117,7 +117,7 @@ void ApInterfaceImpl::OnStationEvent(
       vector<uint8_t> mac_return_address = vector<uint8_t>(mac_address.begin(), mac_address.end());
       const auto iterator = std::find_if(connected_clients_.begin(), connected_clients_.end(),
               [&] (NativeWifiClient const& p) {
-                  return p.macAddress == mac_return_address;
+                  return p.mac_address_ == mac_return_address;
           });
 
       if (iterator != connected_clients_.end()) {
