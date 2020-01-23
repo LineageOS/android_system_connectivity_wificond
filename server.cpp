@@ -38,6 +38,7 @@ using android::net::wifi::IInterfaceEventCallback;
 using android::wifi_system::InterfaceTool;
 
 using std::endl;
+using std::optional;
 using std::placeholders::_1;
 using std::string;
 using std::stringstream;
@@ -240,7 +241,7 @@ void Server::MarkDownAllInterfaces() {
 }
 
 Status Server::getAvailable2gChannels(
-    std::unique_ptr<vector<int32_t>>* out_frequencies) {
+    std::optional<vector<int32_t>>* out_frequencies) {
   BandInfo band_info;
   ScanCapabilities scan_capabilities_ignored;
   WiphyFeatures wiphy_features_ignored;
@@ -249,17 +250,16 @@ Status Server::getAvailable2gChannels(
                                     &scan_capabilities_ignored,
                                     &wiphy_features_ignored)) {
     LOG(ERROR) << "Failed to get wiphy info from kernel";
-    out_frequencies->reset(nullptr);
+    out_frequencies->reset();
     return Status::ok();
   }
 
-  out_frequencies->reset(
-      new vector<int32_t>(band_info.band_2g.begin(), band_info.band_2g.end()));
+  out_frequencies->emplace(band_info.band_2g.begin(), band_info.band_2g.end());
   return Status::ok();
 }
 
 Status Server::getAvailable5gNonDFSChannels(
-    std::unique_ptr<vector<int32_t>>* out_frequencies) {
+    std::optional<vector<int32_t>>* out_frequencies) {
   BandInfo band_info;
   ScanCapabilities scan_capabilities_ignored;
   WiphyFeatures wiphy_features_ignored;
@@ -268,17 +268,16 @@ Status Server::getAvailable5gNonDFSChannels(
                                     &scan_capabilities_ignored,
                                     &wiphy_features_ignored)) {
     LOG(ERROR) << "Failed to get wiphy info from kernel";
-    out_frequencies->reset(nullptr);
+    out_frequencies->reset();
     return Status::ok();
   }
 
-  out_frequencies->reset(
-      new vector<int32_t>(band_info.band_5g.begin(), band_info.band_5g.end()));
+  out_frequencies->emplace(band_info.band_5g.begin(), band_info.band_5g.end());
   return Status::ok();
 }
 
 Status Server::getAvailableDFSChannels(
-    std::unique_ptr<vector<int32_t>>* out_frequencies) {
+    std::optional<vector<int32_t>>* out_frequencies) {
   BandInfo band_info;
   ScanCapabilities scan_capabilities_ignored;
   WiphyFeatures wiphy_features_ignored;
@@ -287,12 +286,12 @@ Status Server::getAvailableDFSChannels(
                                     &scan_capabilities_ignored,
                                     &wiphy_features_ignored)) {
     LOG(ERROR) << "Failed to get wiphy info from kernel";
-    out_frequencies->reset(nullptr);
+    out_frequencies->reset();
     return Status::ok();
   }
 
-  out_frequencies->reset(new vector<int32_t>(band_info.band_dfs.begin(),
-                                             band_info.band_dfs.end()));
+  out_frequencies->emplace(band_info.band_dfs.begin(),
+                           band_info.band_dfs.end());
   return Status::ok();
 }
 
