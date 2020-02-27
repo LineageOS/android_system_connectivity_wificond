@@ -56,13 +56,13 @@ class Server : public android::net::wifi::BnWificond {
           callback) override;
   // Returns a vector of available frequencies for 2.4GHz channels.
   android::binder::Status getAvailable2gChannels(
-      ::std::unique_ptr<::std::vector<int32_t>>* out_frequencies) override;
+      ::std::optional<::std::vector<int32_t>>* out_frequencies) override;
   // Returns a vector of available frequencies for 5GHz non-DFS channels.
   android::binder::Status getAvailable5gNonDFSChannels(
-      ::std::unique_ptr<::std::vector<int32_t>>* out_frequencies) override;
+      ::std::optional<::std::vector<int32_t>>* out_frequencies) override;
   // Returns a vector of available frequencies for DFS channels.
   android::binder::Status getAvailableDFSChannels(
-      ::std::unique_ptr<::std::vector<int32_t>>* out_frequencies) override;
+      ::std::optional<::std::vector<int32_t>>* out_frequencies) override;
 
   android::binder::Status createApInterface(
       const std::string& iface_name,
