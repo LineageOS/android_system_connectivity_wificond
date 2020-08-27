@@ -29,9 +29,9 @@
 #include "wificond/scanning/scan_utils.h"
 #include "wificond/scanning/scanner_impl.h"
 
-using android::net::wifi::IClientInterface;
-using android::net::wifi::ISendMgmtFrameEvent;
-using com::android::server::wifi::wificond::NativeScanResult;
+using android::net::wifi::nl80211::IClientInterface;
+using android::net::wifi::nl80211::ISendMgmtFrameEvent;
+using android::net::wifi::nl80211::NativeScanResult;
 using android::sp;
 using android::wifi_system::InterfaceTool;
 
@@ -39,6 +39,8 @@ using std::endl;
 using std::string;
 using std::unique_ptr;
 using std::vector;
+
+using namespace std::placeholders;
 
 namespace android {
 namespace wificond {
@@ -131,6 +133,9 @@ ClientInterfaceImpl::ClientInterfaceImpl(
         }
       });
 
+  netlink_utils_->SubscribeChannelSwitchEvent(interface_index_,
+      std::bind(&ClientInterfaceImpl::OnChannelSwitchEvent, this, _1));
+
   if (!netlink_utils_->GetWiphyInfo(wiphy_index_,
                                &band_info_,
                                &scan_capabilities_,
@@ -154,10 +159,11 @@ ClientInterfaceImpl::~ClientInterfaceImpl() {
   scanner_->Invalidate();
   netlink_utils_->UnsubscribeFrameTxStatusEvent(interface_index_);
   netlink_utils_->UnsubscribeMlmeEvent(interface_index_);
+  netlink_utils_->UnsubscribeChannelSwitchEvent(interface_index_);
   if_tool_->SetUpState(interface_name_.c_str(), false);
 }
 
-sp<android::net::wifi::IClientInterface> ClientInterfaceImpl::GetBinder() const {
+sp<android::net::wifi::nl80211::IClientInterface> ClientInterfaceImpl::GetBinder() const {
   return binder_;
 }
 
@@ -236,24 +242,6 @@ const std::array<uint8_t, ETH_ALEN>& ClientInterfaceImpl::GetMacAddress() {
   return interface_mac_addr_;
 }
 
-bool ClientInterfaceImpl::SetMacAddress(const std::array<uint8_t, ETH_ALEN>& mac) {
-  if (!if_tool_->SetWifiUpState(false)) {
-    LOG(ERROR) << "SetWifiUpState(false) failed.";
-    return false;
-  }
-  if (!if_tool_->SetMacAddress(interface_name_.c_str(), mac)) {
-    LOG(ERROR) << "SetMacAddress(" << interface_name_ << ", "
-               << LoggingUtils::GetMacString(mac) << ") failed.";
-    return false;
-  }
-  if (!if_tool_->SetWifiUpState(true)) {
-    LOG(ERROR) << "SetWifiUpState(true) failed.";
-    return false;
-  }
-  LOG(DEBUG) << "Successfully SetMacAddress.";
-  return true;
-}
-
 bool ClientInterfaceImpl::RefreshAssociateFreq() {
   // wpa_supplicant fetches associate frequency using the latest scan result.
   // We should follow the same method here before we find a better solution.
@@ -267,6 +255,16 @@ bool ClientInterfaceImpl::RefreshAssociateFreq() {
     }
   }
   return false;
+}
+
+bool ClientInterfaceImpl::OnChannelSwitchEvent(uint32_t frequency) {
+  if(!frequency) {
+    LOG(ERROR) << "Frequency value is null";
+    return false;
+  }
+  LOG(INFO) << "New channel on frequency: " << frequency;
+  associate_freq_ = frequency;
+  return true;
 }
 
 bool ClientInterfaceImpl::IsAssociated() const {

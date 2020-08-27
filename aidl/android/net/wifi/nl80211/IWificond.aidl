@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-package android.net.wifi;
+package android.net.wifi.nl80211;
 
-import android.net.wifi.IApInterface;
-import android.net.wifi.IClientInterface;
-import android.net.wifi.IInterfaceEventCallback;
+import android.net.wifi.nl80211.IApInterface;
+import android.net.wifi.nl80211.IClientInterface;
+import android.net.wifi.nl80211.IInterfaceEventCallback;
+import android.net.wifi.nl80211.DeviceWiphyCapabilities;
 
-// Service interface that exposes primitives for controlling the WiFi
-// subsystems of a device.
+/**
+ * Service interface that exposes primitives for controlling the WiFi
+ * subsystems of a device.
+ * @hide
+ */
 interface IWificond {
 
     // Create a network interface suitable for use as an AP.
@@ -59,6 +63,10 @@ interface IWificond {
     // Returrns null on failure.
     @nullable int[] getAvailableDFSChannels();
 
+    // Returns an array of available frequencies for 6GHz channels.
+    // Returrns null on failure.
+    @nullable int[] getAvailable6gChannels();
+
     // Register a callback to receive interface status updates.
     //
     // Multiple callbacks can be registered simultaneously.
@@ -74,4 +82,7 @@ interface IWificond {
     //
     // @param callback object to remove from the set of registered callbacks.
     oneway void UnregisterCallback(IInterfaceEventCallback callback);
+
+    // @return a device wiphy capabilities for an interface
+    @nullable DeviceWiphyCapabilities getDeviceWiphyCapabilities(@utf8InCpp String iface_name);
 }

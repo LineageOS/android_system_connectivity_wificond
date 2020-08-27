@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright (C) 2019 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,34 +14,30 @@
  * limitations under the License.
  */
 
-#ifndef WIFICOND_SCANNING_HIDDEN_NETWORK_H_
-#define WIFICOND_SCANNING_HIDDEN_NETWORK_H_
+#include "wificond/client/native_wifi_client.h"
 
-#include <vector>
+#include <android-base/logging.h>
 
-#include <binder/Parcel.h>
-#include <binder/Parcelable.h>
+#include "wificond/parcelable_utils.h"
+
+using android::status_t;
 
 namespace android {
 namespace net {
 namespace wifi {
 namespace nl80211 {
 
-class HiddenNetwork : public ::android::Parcelable {
- public:
-  HiddenNetwork() = default;
-  bool operator==(const HiddenNetwork& rhs) const {
-    return ssid_ == rhs.ssid_;
-  }
-  ::android::status_t writeToParcel(::android::Parcel* parcel) const override;
-  ::android::status_t readFromParcel(const ::android::Parcel* parcel) override;
+status_t NativeWifiClient::writeToParcel(::android::Parcel* parcel) const {
+  RETURN_IF_FAILED(parcel->writeByteVector(mac_address_));
+  return ::android::OK;
+}
 
-  std::vector<uint8_t> ssid_;
-};
+status_t NativeWifiClient::readFromParcel(const ::android::Parcel* parcel) {
+  RETURN_IF_FAILED(parcel->readByteVector(&mac_address_));
+  return ::android::OK;
+}
 
 }  // namespace nl80211
 }  // namespace wifi
 }  // namespace net
 }  // namespace android
-
-#endif  // WIFICOND_SCANNING_HIDDEN_NETWORK_H_

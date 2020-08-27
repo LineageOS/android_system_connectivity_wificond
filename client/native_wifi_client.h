@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright (C) 2019 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef WIFICOND_SCANNING_HIDDEN_NETWORK_H_
-#define WIFICOND_SCANNING_HIDDEN_NETWORK_H_
+#ifndef WIFICOND_NATIVE_WIFI_CLIENT_H_
+#define WIFICOND_NATIVE_WIFI_CLIENT_H_
 
 #include <vector>
 
@@ -27,16 +27,16 @@ namespace net {
 namespace wifi {
 namespace nl80211 {
 
-class HiddenNetwork : public ::android::Parcelable {
+class NativeWifiClient : public ::android::Parcelable {
  public:
-  HiddenNetwork() = default;
-  bool operator==(const HiddenNetwork& rhs) const {
-    return ssid_ == rhs.ssid_;
+  NativeWifiClient() = default;
+  bool operator==(const NativeWifiClient& rhs) const {
+    return mac_address_ == rhs.mac_address_;
   }
   ::android::status_t writeToParcel(::android::Parcel* parcel) const override;
   ::android::status_t readFromParcel(const ::android::Parcel* parcel) override;
 
-  std::vector<uint8_t> ssid_;
+  std::vector<uint8_t> mac_address_;
 };
 
 }  // namespace nl80211
@@ -44,4 +44,4 @@ class HiddenNetwork : public ::android::Parcelable {
 }  // namespace net
 }  // namespace android
 
-#endif  // WIFICOND_SCANNING_HIDDEN_NETWORK_H_
+#endif  // WIFICOND_NATIVE_WIFI_CLIENT_H_

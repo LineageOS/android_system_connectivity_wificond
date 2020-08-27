@@ -21,18 +21,18 @@
 
 #include "wificond/net/netlink_manager.h"
 
-#include "android/net/wifi/BnApInterface.h"
-#include "android/net/wifi/IApInterfaceEventCallback.h"
+#include "android/net/wifi/nl80211/BnApInterface.h"
+#include "android/net/wifi/nl80211/IApInterfaceEventCallback.h"
 
-using android::net::wifi::IApInterfaceEventCallback;
-using com::android::server::wifi::wificond::NativeWifiClient;
+using android::net::wifi::nl80211::IApInterfaceEventCallback;
+using android::net::wifi::nl80211::NativeWifiClient;
 
 namespace android {
 namespace wificond {
 
 class ApInterfaceImpl;
 
-class ApInterfaceBinder : public android::net::wifi::BnApInterface {
+class ApInterfaceBinder : public android::net::wifi::nl80211::BnApInterface {
  public:
   explicit ApInterfaceBinder(ApInterfaceImpl* impl);
   ~ApInterfaceBinder() override;
@@ -43,8 +43,7 @@ class ApInterfaceBinder : public android::net::wifi::BnApInterface {
   void NotifyImplDead() { impl_ = nullptr; }
 
   // Called by |impl_| every time the access point's connected clients change.
-  void NotifyConnectedClientsChanged(const
-    std::vector<NativeWifiClient>& clients);
+  void NotifyConnectedClientsChanged(const NativeWifiClient client, bool isConnected);
 
   // Called by |impl_| on every channel switch event.
   void NotifySoftApChannelSwitched(int frequency,
@@ -54,9 +53,6 @@ class ApInterfaceBinder : public android::net::wifi::BnApInterface {
       const sp<IApInterfaceEventCallback>& callback,
       bool* out_success) override;
   binder::Status getInterfaceName(std::string* out_name) override;
-  binder::Status getConnectedClients(
-        std::vector<NativeWifiClient>*
-            out_connected_clients) override;
 
  private:
   ApInterfaceImpl* impl_;

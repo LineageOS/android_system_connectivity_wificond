@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-package android.net.wifi;
+package android.net.wifi.nl80211;
 
-import android.net.wifi.IApInterfaceEventCallback;
-import com.android.server.wifi.wificond.NativeWifiClient;
+import android.net.wifi.nl80211.IApInterfaceEventCallback;
+import android.net.wifi.nl80211.NativeWifiClient;
 
-// IApInterface represents a network interface configured to act as a
-// WiFi access point.
+/**
+ * IApInterface represents a network interface configured to act as a
+ * WiFi access point.
+ * @hide
+ */
 interface IApInterface {
 
   const int ENCRYPTION_TYPE_NONE = 0;
@@ -37,7 +40,4 @@ interface IApInterface {
   // IApInterface instance (e.g. "wlan0")
   @utf8InCpp
   String getInterfaceName();
-
-  // @return Returns the associated devices to this hotspot.
-  NativeWifiClient[] getConnectedClients();
 }

@@ -14,9 +14,12 @@
  * limitations under the License.
  */
 
-package android.net.wifi;
+package android.net.wifi.nl80211;
 
-// A callback to notify the results of sending a management frame.
+/**
+ * A callback to notify the results of sending a management frame.
+ * @hide
+ */
 interface ISendMgmtFrameEvent {
   // Error codes for OnFailure():
 

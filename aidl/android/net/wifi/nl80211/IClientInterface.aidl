@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-package android.net.wifi;
+package android.net.wifi.nl80211;
 
-import android.net.wifi.ISendMgmtFrameEvent;
-import android.net.wifi.IWifiScannerImpl;
+import android.net.wifi.nl80211.ISendMgmtFrameEvent;
+import android.net.wifi.nl80211.IWifiScannerImpl;
 
-// IClientInterface represents a network interface that can be used to connect
-// to access points and obtain internet connectivity.
+/**
+ * IClientInterface represents a network interface that can be used to connect
+ * to access points and obtain internet connectivity.
+ * @hide
+ */
 interface IClientInterface {
   // Get packet counters for this interface.
   // First element in array is the number of successfully transmitted packets.
@@ -49,10 +52,6 @@ interface IClientInterface {
   // Get a WifiScanner interface associated with this interface.
   // Returns null when the underlying interface object is destroyed.
   @nullable IWifiScannerImpl getWifiScannerImpl();
-
-  // Set the MAC address of this interface
-  // Returns true if the set was successful
-  boolean setMacAddress(in byte[] mac);
 
   // Sends an arbitrary 802.11 management frame on the current channel.
   // @param frame Bytes of the 802.11 management frame to be sent, including the

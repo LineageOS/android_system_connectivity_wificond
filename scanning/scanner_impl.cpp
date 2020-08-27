@@ -26,13 +26,13 @@
 #include "wificond/scanning/scan_utils.h"
 
 using android::binder::Status;
-using android::net::wifi::IPnoScanEvent;
-using android::net::wifi::IScanEvent;
-using android::net::wifi::IWifiScannerImpl;
 using android::sp;
-using com::android::server::wifi::wificond::NativeScanResult;
-using com::android::server::wifi::wificond::PnoSettings;
-using com::android::server::wifi::wificond::SingleScanSettings;
+using android::net::wifi::nl80211::IPnoScanEvent;
+using android::net::wifi::nl80211::IScanEvent;
+using android::net::wifi::nl80211::IWifiScannerImpl;
+using android::net::wifi::nl80211::NativeScanResult;
+using android::net::wifi::nl80211::PnoSettings;
+using android::net::wifi::nl80211::SingleScanSettings;
 
 using std::string;
 using std::vector;
@@ -73,6 +73,7 @@ ScannerImpl::ScannerImpl(uint32_t interface_index,
     : valid_(true),
       scan_started_(false),
       pno_scan_started_(false),
+      nodev_counter_(0),
       interface_index_(interface_index),
       scan_capabilities_(scan_capabilities),
       wiphy_features_(wiphy_features),
@@ -174,10 +175,16 @@ Status ScannerImpl::scan(const SingleScanSettings& scan_settings,
   int error_code = 0;
   if (!scan_utils_->Scan(interface_index_, request_random_mac, scan_type,
                          ssids, freqs, &error_code)) {
-    CHECK(error_code != ENODEV) << "Driver is in a bad state, restarting wificond";
+    if (error_code == ENODEV) {
+        nodev_counter_ ++;
+        LOG(WARNING) << "Scan failed with error=nodev. counter=" << nodev_counter_;
+    }
+    CHECK(error_code != ENODEV || nodev_counter_ <= 3)
+        << "Driver is in a bad state, restarting wificond";
     *out_success = false;
     return Status::ok();
   }
+  nodev_counter_ = 0;
   scan_started_ = true;
   *out_success = true;
   return Status::ok();
@@ -274,13 +281,19 @@ bool ScannerImpl::StartPnoScanDefault(const PnoSettings& pno_settings) {
                                        GenerateIntervalSetting(pno_settings),
                                        pno_settings.min_2g_rssi_,
                                        pno_settings.min_5g_rssi_,
+                                       pno_settings.min_6g_rssi_,
                                        req_flags,
                                        scan_ssids,
                                        match_ssids,
                                        freqs,
                                        &error_code)) {
+    if (error_code == ENODEV) {
+        nodev_counter_ ++;
+        LOG(WARNING) << "Pno Scan failed with error=nodev. counter=" << nodev_counter_;
+    }
     LOG(ERROR) << "Failed to start pno scan";
-    CHECK(error_code != ENODEV) << "Driver is in a bad state, restarting wificond";
+    CHECK(error_code != ENODEV || nodev_counter_ <= 3)
+        << "Driver is in a bad state, restarting wificond";
     return false;
   }
   string freq_string;
@@ -293,6 +306,7 @@ bool ScannerImpl::StartPnoScanDefault(const PnoSettings& pno_settings) {
     }
   }
   LOG(INFO) << "Pno scan started " << freq_string;
+  nodev_counter_ = 0;
   pno_scan_started_ = true;
   return true;
 }
@@ -410,7 +424,7 @@ void ScannerImpl::OnSchedScanResultsReady(uint32_t interface_index,
 }
 
 SchedScanIntervalSetting ScannerImpl::GenerateIntervalSetting(
-    const ::com::android::server::wifi::wificond::PnoSettings&
+    const android::net::wifi::nl80211::PnoSettings&
         pno_settings) const {
   bool support_num_scan_plans = scan_capabilities_.max_num_scan_plans >= 2;
   bool support_scan_plan_interval =
