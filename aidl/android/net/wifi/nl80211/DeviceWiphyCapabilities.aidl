@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright (C) 2020 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,6 @@
  * limitations under the License.
  */
 
-#include "wificond/ipc_constants.h"
+package android.net.wifi.nl80211;
 
-namespace android {
-namespace wificond {
-namespace ipc_constants {
-
-const char kServiceName[] = "wifinl80211";
-
-}  // namespace ipc_constants
-}  // namespace wificond
-}  // namespace android
-
+parcelable DeviceWiphyCapabilities cpp_header "wificond/device_wiphy_capabilities.h";

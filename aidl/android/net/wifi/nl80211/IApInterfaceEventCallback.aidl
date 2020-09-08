@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-package android.net.wifi;
+package android.net.wifi.nl80211;
 
-import com.android.server.wifi.wificond.NativeWifiClient;
+import android.net.wifi.nl80211.NativeWifiClient;
 
-// A callback for receiving events related to soft AP.
+/**
+ * A callback for receiving events related to soft AP.
+ * @hide
+ */
 oneway interface IApInterfaceEventCallback {
 
   // Channel bandwidth type. Used in |onSoftApChannelSwitched|
@@ -33,7 +36,7 @@ oneway interface IApInterfaceEventCallback {
   // Signals that the stations associated to this soft Ap have changed.
   //
   // @param clients The associated stations after change
-  void onConnectedClientsChanged(in NativeWifiClient[] clients);
+  void onConnectedClientsChanged(in NativeWifiClient client, in boolean isConnected);
 
   // Signals a channel switch event for this soft Ap.
   //

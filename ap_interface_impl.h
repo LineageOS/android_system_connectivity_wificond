@@ -28,10 +28,10 @@
 
 #include "wificond/net/netlink_manager.h"
 
-#include "android/net/wifi/IApInterface.h"
+#include "android/net/wifi/nl80211/IApInterface.h"
 
-using android::net::wifi::IApInterface;
-using com::android::server::wifi::wificond::NativeWifiClient;
+using android::net::wifi::nl80211::IApInterface;
+using android::net::wifi::nl80211::NativeWifiClient;
 
 namespace android {
 namespace wificond {
@@ -55,7 +55,6 @@ class ApInterfaceImpl {
   android::sp<IApInterface> GetBinder() const;
 
   std::string GetInterfaceName() { return interface_name_; }
-  std::vector<NativeWifiClient> GetConnectedClients() const;
   void Dump(std::stringstream* ss) const;
 
  private:
@@ -64,9 +63,6 @@ class ApInterfaceImpl {
   NetlinkUtils* const netlink_utils_;
   wifi_system::InterfaceTool* const if_tool_;
   const android::sp<ApInterfaceBinder> binder_;
-
-  // Currently connected access point clients
-  std::vector<NativeWifiClient> connected_clients_;
 
   void OnStationEvent(StationEvent event,
                       const std::array<uint8_t, ETH_ALEN>& mac_address);

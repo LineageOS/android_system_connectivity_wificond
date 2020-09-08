@@ -39,12 +39,14 @@ cc_binary {
     shared_libs: [
         "libbinder",
         "libbase",
+        "libcrypto",
         "libcutils",
         "libhidlbase",
         "libkeystore_aidl",
         "libkeystore_binder",
         "libkeystore_parcelables",
         "libminijail",
+        "libssl",
         "libutils",
         "libwifi-system-iface",
         "android.system.wifi.keystore@1.0",
@@ -66,7 +68,9 @@ cc_library_static {
         "ap_interface_impl.cpp",
         "client_interface_binder.cpp",
         "client_interface_impl.cpp",
+        "device_wiphy_capabilities.cpp",
         "logging_utils.cpp",
+        "client/native_wifi_client.cpp",
         "scanning/channel_settings.cpp",
         "scanning/hidden_network.cpp",
         "scanning/pno_network.cpp",
@@ -135,8 +139,9 @@ cc_library_static {
     },
     srcs: [
         "ipc_constants.cpp",
-        ":libwificond_ipc_user_space_aidl",
         ":libwificond_ipc_aidl",
+        "client/native_wifi_client.cpp",
+        "device_wiphy_capabilities.cpp",
         "scanning/channel_settings.cpp",
         "scanning/hidden_network.cpp",
         "scanning/pno_network.cpp",
@@ -151,27 +156,18 @@ cc_library_static {
 filegroup {
     name: "libwificond_ipc_aidl",
     srcs: [
-        "aidl/android/net/wifi/IApInterface.aidl",
-        "aidl/android/net/wifi/IApInterfaceEventCallback.aidl",
-        "aidl/android/net/wifi/IClientInterface.aidl",
-        "aidl/android/net/wifi/IInterfaceEventCallback.aidl",
-        "aidl/android/net/wifi/IPnoScanEvent.aidl",
-        "aidl/android/net/wifi/IScanEvent.aidl",
-        "aidl/android/net/wifi/ISendMgmtFrameEvent.aidl",
-        "aidl/android/net/wifi/IWificond.aidl",
-        "aidl/android/net/wifi/IWifiScannerImpl.aidl",
+        "aidl/android/net/wifi/nl80211/IApInterface.aidl",
+        "aidl/android/net/wifi/nl80211/IApInterfaceEventCallback.aidl",
+        "aidl/android/net/wifi/nl80211/IClientInterface.aidl",
+        "aidl/android/net/wifi/nl80211/IInterfaceEventCallback.aidl",
+        "aidl/android/net/wifi/nl80211/IPnoScanEvent.aidl",
+        "aidl/android/net/wifi/nl80211/IScanEvent.aidl",
+        "aidl/android/net/wifi/nl80211/ISendMgmtFrameEvent.aidl",
+        "aidl/android/net/wifi/nl80211/IWificond.aidl",
+        "aidl/android/net/wifi/nl80211/IWifiScannerImpl.aidl",
     ],
     path: "aidl",
 }
-
-filegroup {
-    name: "libwificond_ipc_user_space_aidl",
-    srcs: [
-        "aidl/com/android/server/wifi/wificond/NativeWifiClient.aidl",
-    ],
-    path: "aidl",
-}
-
 
 //
 // test util library
@@ -207,6 +203,7 @@ cc_test {
         "tests/mock_netlink_manager.cpp",
         "tests/mock_netlink_utils.cpp",
         "tests/mock_scan_utils.cpp",
+        "tests/native_wifi_client_unittest.cpp",
         "tests/netlink_manager_unittest.cpp",
         "tests/netlink_utils_unittest.cpp",
         "tests/nl80211_attribute_unittest.cpp",
