@@ -145,14 +145,14 @@ int main(int argc, char** argv) {
   android::wificond::NetlinkUtils netlink_utils(&netlink_manager);
   android::wificond::ScanUtils scan_utils(&netlink_manager);
 
-  unique_ptr<android::wificond::Server> server(new android::wificond::Server(
+  android::sp<android::wificond::Server> server(new android::wificond::Server(
       unique_ptr<InterfaceTool>(new InterfaceTool),
       unique_ptr<SupplicantManager>(new SupplicantManager()),
       unique_ptr<HostapdManager>(new HostapdManager()),
       &netlink_utils,
       &scan_utils));
   server->CleanUpSystemState();
-  RegisterServiceOrCrash(server.get());
+  RegisterServiceOrCrash(server);
 
   event_dispatcher->Poll();
   LOG(INFO) << "wificond is about to exit";
